@@ -5,5 +5,8 @@
 
 学习项目，比较粗糙，还在改进中。
 
+---
+
 效果截图：
+
 ![](https://github.com/taihangg/task_calendar/blob/master/sample_photos/sample1.png)
