@@ -21,8 +21,7 @@ class MyMonthView extends StatefulWidget {
 class MyMonthViewState extends State<MyMonthView> {
   final double screenWidth;
 
-  final Function(DateTime, bool) onSelectCallback =
-      MyGlobalData.data.updateSelectDate;
+  final Function(DateTime, bool) onSelectCallback = MyGlobalData.data.updateSelectDate;
 
   MyMonthViewState(this.screenWidth);
 
@@ -37,136 +36,132 @@ class MyMonthViewState extends State<MyMonthView> {
     List<DayBox> _list = [];
 
     LunarMonth lunar;
+    String lunarStr, gregorianStr;
+    Color lunarColor, gregorianColor;
     _MyMonthInfo monthInfo;
-
-    // last month
-    lunar = MyGlobalData.data.monthViewLunarArr[0];
-    monthInfo = _monthViewDate.data[0];
-    for (var index = 0, day = monthInfo.firstShowDay;
-        index < monthInfo.showCount;
-        index++, day++) {
-      var date = DateTime(monthInfo.year, monthInfo.month, day);
-      var selected = _isSameDay(date, MyGlobalData.data.selectedDate);
-
-      String lunarStr = "";
-      Color lunarColor;
+    bool showGregorianMonth;
+    bool showLunarMonth;
+    int day;
+    getNoteStr() {
+      lunarStr = null;
+      lunarColor = null;
+      gregorianStr = null;
+      gregorianColor = null;
       if (null != lunar) {
         assert((lunar.monthDaysCount == monthInfo.daysCount) &&
             (lunar.gregorianMonth == monthInfo.month) &&
             (lunar.gregorianYear == monthInfo.year));
         var lunarDayInfo = lunar.days[day - 1];
-        if ("" != lunarDayInfo.jieqi) {
-          lunarStr = lunarDayInfo.jieqi;
-          lunarColor = Colors.red;
-        } else if (0 != lunarDayInfo.lunarDayIndex) {
-          lunarStr = lunarDayInfo.lunarDayName;
-        } else {
+
+        if (0 == lunarDayInfo.lunarDayIndex) {
+          showLunarMonth = false;
+        }
+
+        //农历信息+
+        if ("" != lunarDayInfo.lunarFestival) {
+          //农历节日
+          lunarStr = lunarDayInfo.lunarFestival;
+          lunarColor = Colors.orange;
+        } else if (true != showLunarMonth) {
+          //农历月首日
           lunarStr = lunarDayInfo.lunarMonthName;
           lunarColor = Colors.orange;
+          showLunarMonth = true;
+        } else {
+          //农历日期
+          lunarStr = lunarDayInfo.lunarDayName;
+        }
+
+        //公历信息
+        if ("" != lunarDayInfo.jieqi) {
+          //节气
+          gregorianStr = lunarDayInfo.jieqi;
+          gregorianColor = Colors.red;
+        } else if ("" != lunarDayInfo.gregorianFestival) {
+          //公历节日
+          gregorianStr = lunarDayInfo.gregorianFestival;
+          gregorianColor = Colors.orange;
+        } else if (true != showGregorianMonth) {
+          gregorianStr = "${monthInfo.month}月";
+          gregorianColor = Colors.orange;
+          showGregorianMonth = true;
         }
       }
+    }
+
+    // last month
+    showGregorianMonth = false;
+    lunar = MyGlobalData.data.monthViewLunarArr[0];
+    monthInfo = _monthViewDate.data[0];
+    day = monthInfo.firstShowDay;
+    for (int index = 0; index < monthInfo.showCount; index++, day++) {
+      var date = DateTime(monthInfo.year, monthInfo.month, day);
+      var selected = _isSameDay(date, MyGlobalData.data.selectedDate);
+
+      getNoteStr();
 
       _list.add(DayBox(date, screenWidth,
           showNoteIcon: _hasTask(date),
           noteActive: !_isTaskALlDone(date),
           selected: selected,
           baskgroundGrey: true,
-          lunarInfo: lunarStr,
+          gregorianStr: gregorianStr,
+          gregorianColor: gregorianColor,
+          lunarStr: lunarStr,
           lunarColor: lunarColor,
           onSelectCallback: onSelectCallback));
     }
 
-    // 上个月的第一天显示月份
-    var count = _list.length;
-    if (0 != count) {
-      _list[0].showMonth = true;
-    }
-
     // current month
+    showGregorianMonth = false;
     lunar = MyGlobalData.data.monthViewLunarArr[1];
     monthInfo = _monthViewDate.data[1];
     var dt = _monthViewDate.dt;
-    for (var index = 0, day = monthInfo.firstShowDay;
-        index < monthInfo.showCount;
-        index++, day++) {
+    var today = DateTime.now();
+    day = monthInfo.firstShowDay;
+    for (var index = 0; index < monthInfo.showCount; index++, day++) {
       var date = DateTime(monthInfo.year, monthInfo.month, day);
       var selected = _isSameDay(date, MyGlobalData.data.selectedDate);
-      var isToday = _isSameDay(date, dt);
+      var isToday = _isSameDay(date, today);
 
-      String lunarStr = "";
-      Color lunarColor;
-      if (null != lunar) {
-        assert((lunar.monthDaysCount == monthInfo.daysCount) &&
-            (lunar.gregorianMonth == monthInfo.month) &&
-            (lunar.gregorianYear == monthInfo.year));
-        var lunarDayInfo = lunar.days[day - 1];
-        if ("" != lunarDayInfo.jieqi) {
-          lunarStr = lunarDayInfo.jieqi;
-          lunarColor = Colors.red;
-        } else if (0 != lunarDayInfo.lunarDayIndex) {
-          lunarStr = lunarDayInfo.lunarDayName;
-        } else {
-          lunarStr = lunarDayInfo.lunarMonthName;
-          lunarColor = Colors.orange;
-        }
-      }
+      getNoteStr();
 
       _list.add(DayBox(date, screenWidth,
           showNoteIcon: _hasTask(date),
           noteActive: !_isTaskALlDone(date),
           selected: selected,
           isToday: isToday,
-          lunarInfo: lunarStr,
+          gregorianStr: gregorianStr,
+          gregorianColor: gregorianColor,
+          lunarStr: lunarStr,
           lunarColor: lunarColor,
           onSelectCallback: onSelectCallback));
     }
 
-    // 本月的第一天显示月份
-    _list[count].showMonth = true;
-    count = _list.length;
-
     // next month
+    showGregorianMonth = false;
     lunar = MyGlobalData.data.monthViewLunarArr[2];
     monthInfo = _monthViewDate.data[2];
-    for (var index = 0, day = monthInfo.firstShowDay;
-        index < monthInfo.showCount;
-        index++, day++) {
+    day = monthInfo.firstShowDay;
+    for (var index = 0; index < monthInfo.showCount; index++, day++) {
       var date = DateTime(monthInfo.year, monthInfo.month, day);
       var selected = _isSameDay(date, MyGlobalData.data.selectedDate);
 
-      String lunarStr = "";
-      Color lunarColor;
-      if (null != lunar) {
-        assert((lunar.monthDaysCount == monthInfo.daysCount) &&
-            (lunar.gregorianMonth == monthInfo.month) &&
-            (lunar.gregorianYear == monthInfo.year));
-        var lunarDayInfo = lunar.days[day - 1];
-        if ("" != lunarDayInfo.jieqi) {
-          lunarStr = lunarDayInfo.jieqi;
-          lunarColor = Colors.red;
-        } else if (0 != lunarDayInfo.lunarDayIndex) {
-          lunarStr = lunarDayInfo.lunarDayName;
-        } else {
-          lunarStr = lunarDayInfo.lunarMonthName;
-          lunarColor = Colors.orange;
-        }
-      }
+      getNoteStr();
 
       _list.add(DayBox(date, screenWidth,
           showNoteIcon: _hasTask(date),
           noteActive: !_isTaskALlDone(date),
           selected: selected,
           baskgroundGrey: true,
-          lunarInfo: lunarStr,
+          gregorianStr: gregorianStr,
+          gregorianColor: gregorianColor,
+          lunarStr: lunarStr,
           lunarColor: lunarColor,
           onSelectCallback: onSelectCallback));
     }
-    if (count != _list.length) {
-      _list[count].showMonth = true;
-    }
 
-    assert(
-        (28 == _list.length) || (35 == _list.length) || (42 == _list.length));
+    assert((28 == _list.length) || (35 == _list.length) || (42 == _list.length));
     return _list;
   }
 
@@ -205,15 +200,13 @@ class MyMonthViewState extends State<MyMonthView> {
             //color: Colors.lightBlueAccent,
             //border: Border.all(width: 1.0, color: Colors.black38),
             borderRadius: BorderRadius.all(Radius.circular(8.0))),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: list));
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: list));
   }
 
   List<Widget> _martrix(final List _weekdays, final List _dayList) {
     var table = <Widget>[];
     // 星期行增加以下上下的间隔
-    table.add(Container(
-        margin: EdgeInsets.fromLTRB(0, 5, 0, 5), child: _styleRow(_weekdays)));
+    table.add(Container(margin: EdgeInsets.fromLTRB(0, 5, 0, 5), child: _styleRow(_weekdays)));
     for (var i = 0; i < _dayList.length; i += 7) {
       table.add(_styleRow(_dayList.sublist(i, i + 7)));
     }
@@ -222,8 +215,7 @@ class MyMonthViewState extends State<MyMonthView> {
 
   @override
   Widget build(BuildContext context) {
-    final _MyMonthViewDateInfo _monthViewDate =
-        _MyMonthViewDateInfo(MyGlobalData.data.monthViewShowDate, 1);
+    final _MyMonthViewDateInfo _monthViewDate = _MyMonthViewDateInfo(MyGlobalData.data.monthViewShowDate, 1);
 
     final List<TitleDay> _weekdays = _weekdayList(1);
     final List<DayBox> _days = _dayList(_monthViewDate);
@@ -265,13 +257,10 @@ class MyMonthViewActionBar extends StatelessWidget {
         //color: Colors.orange,
         child: RaisedButton(
             color: Colors.grey[300],
-            child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(child: Icon(Icons.arrow_back_ios)),
-                  Text("上一月", style: TextStyle(fontSize: screenWidth / 25))
-                ]),
+            child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.start, children: [
+              Container(child: Icon(Icons.arrow_back_ios)),
+              Text("上一月", style: TextStyle(fontSize: screenWidth / 25))
+            ]),
             onPressed: () {
               final cur = MyGlobalData.data.monthViewShowDate;
               final last = DateTime(cur.year, cur.month - 1, 1);
@@ -307,9 +296,7 @@ class MyMonthViewActionBar extends StatelessWidget {
         width: screenWidth / 10,
         child: FloatingActionButton(
           backgroundColor: Colors.yellowAccent,
-          child: Text("今",
-              style: TextStyle(
-                  color: Colors.lightBlue, fontSize: screenWidth / 15)),
+          child: Text("今", style: TextStyle(color: Colors.lightBlue, fontSize: screenWidth / 15)),
           onPressed: () {
             MyGlobalData.data.updateMonthViewShowDate(DateTime.now());
           },
@@ -338,18 +325,12 @@ class MyMonthViewActionBar extends StatelessWidget {
                 //color: Colors.redAccent,
                 border: Border.all(width: 0.5, color: Colors.black38),
                 borderRadius: BorderRadius.all(Radius.circular(8.0))),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: rowChildren)));
+            child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: rowChildren)));
   }
 }
 
 bool _isSameDay(final DateTime dt1, final DateTime dt2) {
-  return ((null != dt1) &&
-      (null != dt2) &&
-      (dt1.day == dt2.day) &&
-      (dt1.month == dt2.month) &&
-      (dt1.year == dt2.year));
+  return ((null != dt1) && (null != dt2) && (dt1.day == dt2.day) && (dt1.month == dt2.month) && (dt1.year == dt2.year));
 }
 
 class _MyMonthInfo {
@@ -363,11 +344,7 @@ class _MyMonthInfo {
 
 class _MyMonthViewDateInfo {
   // 分别是上个月，当前月，下个月的数据
-  final List<_MyMonthInfo> data = [
-    _MyMonthInfo(),
-    _MyMonthInfo(),
-    _MyMonthInfo()
-  ];
+  final List<_MyMonthInfo> data = [_MyMonthInfo(), _MyMonthInfo(), _MyMonthInfo()];
   final DateTime dt;
   final int showFirstWeekday; // 从周几开始显示
   int calendarShowDaysCount; // 月历中需要显示的天数
@@ -387,8 +364,7 @@ class _MyMonthViewDateInfo {
 
       if (1 == showFirstWeekday) {
         lastMonthInfo.showCount = thisMonthFirstWeedday - 1;
-        lastMonthInfo.firstShowDay =
-            lastMonthInfo.daysCount - lastMonthInfo.showCount + 1;
+        lastMonthInfo.firstShowDay = lastMonthInfo.daysCount - lastMonthInfo.showCount + 1;
         lastMonthInfo.lastShowDay = lastMonth.day;
       }
 

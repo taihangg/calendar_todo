@@ -6,8 +6,7 @@ class SxwnlData {
   SxwnlData({this.Id, this.Name, this.Note, this.Data});
 }
 
-final gedijingweidubiao =
-    SxwnlData(Id: "JWdata_JWv", Name: "各地经纬度表", Note: "请参阅经纬数据压缩说明", Data: """
+final gedijingweidubiao = SxwnlData(Id: "JWdata_JWv", Name: "各地经纬度表", Note: "请参阅经纬数据压缩说明", Data: """
 北京市 dshN天安门 dthS北京 dshe通州区 eDhD昌平区 e8hc顺义区 eJhc怀柔区 dihK大兴区 e8i7平谷区 eMho密云县 eSgw延庆县
 河北省 c3fU石家庄 c2fn藁城市 btgD辛集市 c2g2晋州市 cKfe新乐市 c5fI鹿泉市 cFfC平山县 c2f8井陉县 brfd栾城县 c8fY正定县 cQfX行唐县 cIfM灵寿县 bafb高邑县 bjfk赵县 befN赞皇县 cBgC深泽县 cBfw无极县 bjfV元氏县 dbjB唐山 doj7丰润区 dYj7丰南区 eBiv遵化市 dyjg迁安市 e9jJ迁西县 dVjf滦南县 drii玉田县 dHjS唐海县 dPjt乐亭县 dijj滦县 duka秦皇岛 dgkA昌黎县 drjq卢龙县 drkE抚宁县 eJk4青龙满族自治县 aafS邯郸 agfC武安市 aZfW邯郸县 alfT永年县 alfv曲周县 aWgI馆陶县 aLfu魏县 aQfg成安县 aHg9大名县 aYee涉县 atfq鸡泽县 angA邱县 aTfu广平县 aXfm肥乡县 aKfa临漳县 aMfM磁县 b3fU邢台 bMgN南宫市 apfT沙河市 b4fU邢台县 bUff柏乡县 b7fe任县 b4gd清河县 bbft宁晋县 awgG威县 bLfk隆尧县 bQfU临城县 b4g9广宗县 aqgT临西县 bIfV内丘县 b4g1平乡县 bDg1巨鹿县 bWgF新河县 ayff南和县 cpgT保定 dTgw涿州市 cUfx定州市 cPgJ安国市 dJgp高碑店市 cvgJ满城县 cjgT清苑县 dOgg涞水县 cpfB阜平县 d1gd徐水县 dGgk定兴县 cifw唐县 cfgk高阳县 d3gq容城县 dLff涞源县 cgg8望都县 cog7完县 cugu安新县 dLgU易县 cbff曲阳县 cTgY蠡县 cRgS博野县 cwh5雄县 enfr张家口 eag2宣化县 fpfa康保县 f9fh张北县 e7fA阳原县 etgn赤城县 fegg沽源县 eefP怀安县 eOgV怀来县 exgG崇礼县 f5ew尚义县 dofY蔚县 eNgD涿鹿县 ejfh万全县 ewiu承德 ekj9承德县 ePiT兴隆县 fJii隆化县 f0jf平泉县 euiK滦平县 fChc丰宁满族自治县 fvii围场满族蒙古族自治县 eajT宽城满族自治县 cJhq沧州 c4hX泊头市 cgh5任丘市 cMiL黄骅市 cQh5河间市 cJhq沧县 cYhm青县 cBh7献县 brhV东光县 c8iU海兴县 c3iD盐山县 cPgn肃宁县 c2hg南皮县 bbhN吴桥县 c4i5孟村回族自治县 dVhf廊坊 d6hO霸州市 dxi5三河市 dQhG固安县 dKhT永清县 dkhy香河县 cghb大城县 cphR文安县 drhx大厂回族自治县 bigf衡水 bYgY冀州市 c0gW深州市 cFgi饶阳县 bUgh枣强县 bLgw故城县 bqh9阜城县 cEgV安平县 bmgr武邑县 bfhF景县 c3gx武强县
 内蒙古 encd呼和浩特 eHc9托克托县 f6cR武川县 eMcn和林格尔县 dtce清水河县 ehc8土默特左旗 eeam包头 f2b3固阳县 fgbQ达尔罕茂明安联合旗 eXbV土默特右旗 eXbV萨拉齐镇 ffbQ百灵庙镇 deXm乌海 dUXg乌达区 gGjv赤峰 fakK宁城县 haj3林西县 fujg喀喇沁旗 hVje巴林右旗 gHks敖汉旗 hrl5阿鲁科尔沁旗 guk1翁牛特旗 hFiV克什克腾旗 hxkN巴林左旗 fZkK天义镇 ftjf锦山镇 gHks新惠镇 hql5天山镇 guk1乌丹镇 hFiU经棚镇 hxkN林东镇 hVje大板镇 hbnG通辽 jWkd霍林郭勒市 hamI开鲁县 i7oJ科尔沁左翼中旗 gvnL科尔沁左翼后旗 gimk库伦旗 gpld奈曼旗 iXls扎鲁特旗 i8oJ保康镇 gvnK甘旗卡镇 giml库伦镇 gold大沁他拉镇 iXls鲁北镇 dnax鄂尔多斯市 dnay东胜区 dcbq准格尔旗 cZZo乌审旗 dYaj伊金霍洛旗 d6Yx鄂托克旗 cBYS鄂托克前旗 dpZi杭锦旗 eOb1达拉特旗 nCkk呼伦贝尔 nDkh海拉尔区 nZiQ满洲里市 nHli牙克石市 lynj扎兰屯市 olmW根河市 oElA额尔古纳市 nJkQ陈巴尔虎旗 m7oS阿荣旗 mDjG新巴尔虎左旗 mdhn新巴尔虎右旗 oaoh鄂伦春自治旗 mSpU莫力达瓦达斡尔族自治旗 n8ki鄂温克族自治旗 nJkQ巴彦库仁镇 m7oS那吉镇 mDjG阿穆古郎镇 oaoh阿里河镇 mehn阿拉坦额莫勒镇 mSpU尼尔基镇 n8ki巴彦托海镇 ejYQ巴彦淖尔市 eiYQ临河区 f5ZG五原县 eKY1磴口县 erY9杭锦后旗 fYZV乌拉特中旗 ehZd乌拉特前旗 fQY0乌拉特后旗 eKXy巴彦高勒镇 erY9陕坝镇 fXZV海流图镇 f3e6乌兰察布市 f2e5集宁区 eRe8丰镇市 erer兴和县 esdY卓资县 fXeW商都县 eWdT凉城县 frf0化德县 fVcf四子王旗 eleC察哈尔右翼前旗 fGdc察哈尔右翼中旗 fReA察哈尔右翼后旗 fVcg乌兰花镇 ekeD土贵乌拉镇 fGdc科布尔镇 huh4锡林浩特市 hdcw二连浩特市 gBhS多伦县 i1fv阿巴嘎旗 iZib西乌珠穆沁旗 jVhx东乌珠穆沁旗 hpei苏尼特左旗 gjdd苏尼特右旗 frgH太仆寺旗 gIg0正镶白旗 gFh0正蓝旗 gEep镶黄旗 iZia巴彦乌拉镇 jVhw乌里雅斯太镇 hpeh满都拉图镇 gide赛汉塔拉镇 frgH宝昌镇 gFeo新宝拉格镇 k4n2兴安盟 k4n4乌兰浩特市 lIkp阿尔山市 jNmX突泉县 khnt扎赉特旗 jpnR科尔沁右翼前旗 j3mS科尔沁右翼中旗 cpWg阿拉善盟 coWe阿拉善左旗 dCSe阿拉善右旗 fwS4额济纳旗 dCSe额肯呼都格镇 fwS4达来呼布镇
@@ -51,11 +50,8 @@ final shiqubiao = SxwnlData(Id: "JWdata_SQv", Name: "时区表", Note: "", Data:
 大洋洲,埃尼威托克岛,-12##埃尼威托克岛,澳大利亚东部,10#1050d0350d#堪培拉、悉尼、布里斯班,澳大利亚西部,8#1050d0350d#珀斯,澳大利亚中部,9.5#1050d0350d#阿德莱德、达尔文,巴布亚新几内亚,10##莫尔兹比港,北马里亚纳群岛(美),10##塞班,法属波利尼西亚,-10##帕皮提,斐济,12#1110d0250d#苏瓦,关岛(美),10##阿加尼亚,基里巴斯,12##塔拉瓦,库克群岛(新),-10.5##阿瓦鲁阿,马里亚纳群岛,10##塞班岛,马绍尔群岛,12##马朱罗,美属萨摩亚,-11##帕果帕果,密克罗尼西亚,10##帕利基尔,瑙鲁共和国,12##亚伦,所罗门群岛,11##霍尼亚拉,汤加,13#1016d0416d#努库阿洛法,图瓦卢,12##富纳富提,瓦努阿图,11##维拉港,西萨摩亚,-11##阿皮亚,夏威夷(美),-10##檀香山,新喀里多尼亚(法),11##努美阿,新西兰,12#1010d0416d#奥克兰、惠灵顿,新西兰查塔姆群岛,12.75#1010d0416d#查塔姆群岛,中途岛(美),-11##中途岛,国际日期变更线（东）,-12##国际日期变更线（东）,国际日期变更线（西）,12##国际日期变更线（西）</Data>
 """);
 
-final lishijinianbiao = SxwnlData(
-    Id: "obb_JNB",
-    Name: "历史纪年表",
-    Note: "数据用逗号分开,每7个描述一个年号,格式为:起始公元(天文纪年方式),使用年数,已用年数,朝代,朝号,皇帝,年号",
-    Data: """
+final lishijinianbiao =
+    SxwnlData(Id: "obb_JNB", Name: "历史纪年表", Note: "数据用逗号分开,每7个描述一个年号,格式为:起始公元(天文纪年方式),使用年数,已用年数,朝代,朝号,皇帝,年号", Data: """
 -2069,45,0,夏,禹,,禹,
 -2024,10,0,夏,启,,启,
 -2014,25,0,夏,太康,,太康,
@@ -596,7 +592,6 @@ final gregorianFestivals = {
   "6-1": "儿童节",
   "7-1": "建党节",
   "8-1": "建军节",
-  "8-15": "中秋节",
   "9-10": "教师节",
   "10-1": "国庆节",
 };

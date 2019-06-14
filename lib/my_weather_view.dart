@@ -62,14 +62,11 @@ class _MyWeatherPageState extends State<MyWeatherPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("xxx _MyWeatherPageState build");
-
     return Container(
       child: MyGlobalData.data.weatherData.ready
           ? RotatedBox(
               quarterTurns: 1,
-              child: MyAxisChart(
-                  widget.screenWidth, MyGlobalData.data.weatherData.axisData),
+              child: MyAxisChart(widget.screenWidth, MyGlobalData.data.weatherData.axisData),
             )
           : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               Text(_statusText, style: TextStyle(fontSize: 30)),

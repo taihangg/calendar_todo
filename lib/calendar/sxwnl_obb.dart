@@ -20,9 +20,7 @@ class obb {
       if ((y < j) || (y >= j + ob[i + 1].toInt())) {
         continue;
       }
-      c = ob[i + 6].toString() +
-          (y - j + 1 + ob[i + 2].toInt()).toString() +
-          "年"; // 年号及年次
+      c = ob[i + 6].toString() + (y - j + 1 + ob[i + 2].toInt()).toString() + "年"; // 年号及年次
       s += (s.length > 0 ? ";" : "") +
           "[" +
           ob[i + 3] +
@@ -50,14 +48,12 @@ class obb {
 
   /// 精气计算法 2:
   static double qi_accurate2(double jd) {
-    return obb.qi_accurate(
-        Math.Floor2Double((jd + 293) / 365.2422 * 24) * Math.PI / 12); //精气
+    return obb.qi_accurate(Math.Floor2Double((jd + 293) / 365.2422 * 24) * Math.PI / 12); //精气
   }
 
   /// 精朔计算法 2:
   static double so_accurate2(double jd) {
-    return obb
-        .so_accurate(Math.Floor2Double((jd + 8) / 29.5306) * Math.PI * 2); // 精朔
+    return obb.so_accurate(Math.Floor2Double((jd + 8) / 29.5306) * Math.PI * 2); // 精朔
   }
 
 //  #region 转换时增加的私有字段(用于封装成公共属性, 按转换规范 10 命名)
@@ -165,7 +161,4 @@ class obb {
     "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥",
     "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"
   ];
-
-  // 农历节日的定义
-  static Map<String, String> LunarFeasts = lunarfestivals;
 }
