@@ -9,7 +9,7 @@ import 'sxwnl_tool.dart';
 
 ///
 /// 农历核心算法类库（含源码），源自许剑伟先生的寿星万年历
-/// 移植字HongchenMeng先生的c#移植项目，地址：https://github.com/HongchenMeng/SharpSxwnl
+/// 移植自HongchenMeng先生的c#移植项目，地址：https://github.com/HongchenMeng/SharpSxwnl
 /// 感谢许剑伟先生！感谢HongchenMeng先生!
 ///
 /// 只想保留 公历->(农历，干支)等信息，在HongchenMeng先生的项目的基础上，去掉了很多信息，修改了一些写法，

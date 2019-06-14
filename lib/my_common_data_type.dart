@@ -21,21 +21,35 @@ class MyTaskEntry {
       children = newChildren;
     }*/
   }
-  addChild(MyTaskEntry child) {
+  _addChild(MyTaskEntry child) {
     child._father = this;
     child._index = children.length;
     children.add(child);
   }
 
-  deleteSelf() {
+  addChildAndRefreshFatherState(MyTaskEntry child) {
+    _addChild(child);
+
+    assert(false == child.state);
+    if (true == state) {
+      updateTreeLineState_new(false);
+    }
+  }
+
+  deleteSelfAndRefreshFatherState() {
+    if (false == state) {
+      _father.updateTreeLineState_new(true);
+    } else {
+      _father.finishedChildCount--;
+    }
+
     assert(null != _father);
     _father.children.removeAt(_index);
 
-    var i = 0;
-    _father.children.forEach((e) {
-      e._index = i;
-      i++;
-    });
+    //更新兄弟节点的索引号
+    for (var i = _index + 1; i < _father.children.length; i++) {
+      _father.children[i]._index--;
+    }
 
     _father = null;
   }
@@ -78,7 +92,7 @@ class MyTaskEntry {
     if (null != childrenList) {
       childrenList.forEach((e) {
         var entry = MyTaskEntry.fromJson(e);
-        addChild(entry);
+        _addChild(entry);
       });
     }
     return;
@@ -213,20 +227,8 @@ class MyTaskEntry {
     return;
   }
 
-  updateTreeLineState2(bool newState) {
-    // 从倒数第二层开始往上回溯，一层一层更新，直到该层状态没有被连带影响
-
-    // 通过dataTreePosition得到tree中的线路
-//    List<MyTaskEntry> treeLine = [_treeRoot];
-//    var posLevel = 0;
-//    // 0.1.2.3.4，其中dataTreePosition[0]没有父节点
-//    dataTreePosition.forEach((i) {
-//      if (0 != posLevel) {
-//        var child = treeLine[posLevel - 1].children[i];
-//        treeLine.add(child);
-//      }
-//      posLevel++;
-//    });
+  updateTreeLineState_new(bool newState) {
+    // 往上回溯一层一层更新状态，直到该层状态没有被连带影响
 
     // 沿着tree中的线路一层一层逆向更新，如果那一层状态没有变化，就直接停止，更上层不会被联动出发状态变化
     //
@@ -246,9 +248,10 @@ class MyTaskEntry {
     //
 
     //var needContine = false;
-    {
-      // 先处理当前节点，
 
+    // 先处理当前节点，
+    {
+      //状态变化规律
       if (null == this.state) {
         assert(false == newState);
         //needContine = true;
@@ -259,9 +262,8 @@ class MyTaskEntry {
         // true == leaf.state
         assert((null == newState) || (false == newState));
       }
-
-      this.state = newState;
     }
+    this.state = newState;
 
     if (null == newState) {
       return;
@@ -269,41 +271,35 @@ class MyTaskEntry {
 
     assert(null != newState);
     var childNewState = newState;
-    for (var e = this._father; null != e; e = e._father) {
+    for (var f = this._father; null != f; f = f._father) {
       var needContinue = false;
 
-      if (null == e.state) {
+      if (null == f.state) {
         // 当前状态为null，只更新计数，不更新状态，不向上层传递状态变化
-        if (true == childNewState) {
-          e.finishedChildCount++;
-        } else {
-          e.finishedChildCount--;
-        }
+        f.finishedChildCount--;
       } else {
-        // null != entry.state
         if (true == childNewState) {
-          e.finishedChildCount++;
-          if (e.finishedChildCount == e.children.length) {
+          f.finishedChildCount++;
+          if (f.finishedChildCount == f.children.length) {
             //如果之前本身是false状态则继续才上报，
             // 如果之前是null或者true状态，是不需要继续上报的
-            if ((null != e.state) && (false == e.state)) {
-              e.state = true;
+            if ((null != f.state) && (false == f.state)) {
+              f.state = true;
               childNewState = true;
               needContinue = true;
             }
           }
         } else {
-          // (false == childNewState)
-          if (e.finishedChildCount == e.children.length) {
+          if (f.finishedChildCount == f.children.length) {
             //如果之前本身是true状态则继续才上报，
             // 如果之前是null或者false状态，是不需要继续上报的
-            if ((null != e.state) && (true == e.state)) {
-              e.state = false;
+            if ((null != f.state) && (true == f.state)) {
+              f.state = false;
               childNewState = false;
               needContinue = true;
             }
           }
-          e.finishedChildCount--;
+          f.finishedChildCount--;
         }
       }
 

@@ -46,8 +46,7 @@ class MyTaskViewState extends State<MyTaskView> {
         child = Container(
             alignment: Alignment.topCenter,
             margin: EdgeInsets.all(10),
-            child: Text("$dateStr 没有计划任务",
-                style: TextStyle(fontSize: width / 15)));
+            child: Text("$dateStr 没有计划任务", style: TextStyle(fontSize: width / 15)));
       }
     } else {
       child = Container(
@@ -75,14 +74,12 @@ class MyExpansionTileRoot extends StatelessWidget {
 
     var children = <Widget>[];
 
-    children.add(
-        _MyExpansionTileItem(width, [entryRoot], [0], entryRoot.children[0]));
+    children.add(_MyExpansionTileItem(width, [entryRoot], [0], entryRoot.children[0]));
 
     var index = 1;
     entryRoot.children.skip(1).forEach((e) {
       children.add(Divider());
-      children.add(_MyExpansionTileItem(
-          width, [entryRoot], [index], entryRoot.children[index]));
+      children.add(_MyExpansionTileItem(width, [entryRoot], [index], entryRoot.children[index]));
       index++;
     });
 
@@ -96,11 +93,8 @@ class _MyExpansionTileItem extends StatefulWidget {
   final List<int> _treeLinePosition;
   final MyTaskEntry _entry;
 
-  _MyExpansionTileItem(
-      this.width, this._treeLine, this._treeLinePosition, this._entry) {
-    assert((null != _treeLinePosition) &&
-        (0 != _treeLinePosition.length) &&
-        (null != _entry));
+  _MyExpansionTileItem(this.width, this._treeLine, this._treeLinePosition, this._entry) {
+    assert((null != _treeLinePosition) && (0 != _treeLinePosition.length) && (null != _entry));
   }
   @override
   createState() => MyExpansionTileItemState(width);
@@ -123,10 +117,6 @@ class MyExpansionTileItemState extends State<_MyExpansionTileItem> {
         (0 != treeLinePosition.length) &&
         (null != entry));
 
-//    String degreeString = (treeLinePosition[0] + 1).toString();
-//    for (var i = 1; i < treeLinePosition.length; i++) {
-//      degreeString += "." + (treeLinePosition[i] + 1).toString();
-//    }
     String degreeString = entry.getDegreeString();
 
     var checkBox = Checkbox(
@@ -135,7 +125,7 @@ class MyExpansionTileItemState extends State<_MyExpansionTileItem> {
       onChanged: (newState) {
         // 如果tristate为true，state的状态变化顺序是: false->ture->null->false
         //MyTaskEntry.updateTreeLineState(treeLine.sublist(0)..add(entry), newState);
-        entry.updateTreeLineState2(newState);
+        entry.updateTreeLineState_new(newState);
         MyGlobalData.data.saveTaskDataAndRefreshView();
       },
     );
@@ -148,18 +138,14 @@ class MyExpansionTileItemState extends State<_MyExpansionTileItem> {
     }
 
     Widget leadingIcon;
-    String statusText;
 
     assert(null != entry.children);
     var midStr = "";
     var tailStr = "";
     if (entry.children.isEmpty) {
-      leadingIcon = Container(
-          child: Text(""), padding: EdgeInsets.fromLTRB(width / 20, 0, 0, 0));
+      leadingIcon = Container(child: Text(""), padding: EdgeInsets.fromLTRB(width / 20, 0, 0, 0));
 
-      tailStr = (null == entry.state)
-          ? "DISABLED"
-          : ((true == entry.state) ? "DONE" : "");
+      tailStr = (null == entry.state) ? "DISABLED" : ((true == entry.state) ? "DONE" : "");
     } else {
       midStr = "${entry.finishedChildCount}/${entry.children.length}";
       tailStr = "${(entry.finishedChildCount * 100) ~/ entry.children.length}%";
@@ -175,54 +161,33 @@ class MyExpansionTileItemState extends State<_MyExpansionTileItem> {
     }
     var children = <Widget>[
       Container(
-          padding: EdgeInsets.fromLTRB(
-              10.0 * (widget._treeLinePosition.length - 1), 0, 0, 0),
+          padding: EdgeInsets.fromLTRB(10.0 * (widget._treeLinePosition.length - 1), 0, 0, 0),
           child: ListTile(
               leading: leadingIcon,
               title: GestureDetector(
                   child: Container(
                       color: _selected ? Colors.black12 : null,
                       child: ListTile(
-                        /*leading: Text(degreeString,
-                            style: TextStyle(
-                                fontSize: width / 20, color: fontColor)),*/
-                        title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(degreeString,
-                                  style: TextStyle(
-                                      fontSize: width / 25,
-                                      color: Colors.orange)),
-                              Text(midStr,
-                                  style: TextStyle(
-                                      fontSize: width / 25,
-                                      color: Colors.orange)),
-                              Text(tailStr,
-                                  style: TextStyle(
-                                      fontSize: width / 25,
-                                      color: Colors.orange)),
-                            ]),
-                        subtitle: Text(entry.content,
-                            style: TextStyle(
-                                fontSize: width / 20, color: fontColor)),
+                        title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                          Text(degreeString, style: TextStyle(fontSize: width / 25, color: Colors.orange)),
+                          Text(midStr, style: TextStyle(fontSize: width / 25, color: Colors.orange)),
+                          Text(tailStr, style: TextStyle(fontSize: width / 25, color: Colors.orange)),
+                        ]),
+                        subtitle: Text(entry.content, style: TextStyle(fontSize: width / 20, color: fontColor)),
                       )),
                   onTap: () {
                     _selected = !_selected;
                     if (_selected) {
-                      if (null !=
-                          MyGlobalData.data.selectedExpansionItemState) {
-                        MyGlobalData.data.selectedExpansionItemState._selected =
-                            false;
-                        MyGlobalData.data.selectedExpansionItemState
-                            .setState(() {});
+                      if (null != MyGlobalData.data.selectedExpansionItemState) {
+                        MyGlobalData.data.selectedExpansionItemState._selected = false;
+                        assert(true == MyGlobalData.data.selectedExpansionItemState.mounted);
+                        MyGlobalData.data.selectedExpansionItemState.setState(() {});
                       }
                       MyGlobalData.data.selectedTaskEntry = entry;
                       MyGlobalData.data.selectedExpansionItemState = this;
-                      if (!isSameMonth(MyGlobalData.data.monthViewShowDate,
-                          MyGlobalData.data.selectedDate)) {
+                      if (!isSameMonth(MyGlobalData.data.monthViewShowDate, MyGlobalData.data.selectedDate)) {
                         // 返回选择的任务的日期的月
-                        MyGlobalData.data.updateMonthViewShowDate(
-                            MyGlobalData.data.selectedDate);
+                        MyGlobalData.data.updateMonthViewShowDate(MyGlobalData.data.selectedDate);
                       }
                     } else {
                       MyGlobalData.data.selectedTaskEntry = null;
@@ -237,8 +202,7 @@ class MyExpansionTileItemState extends State<_MyExpansionTileItem> {
       var index = 0;
       entry.children.forEach((e) {
         children.add(Divider());
-        children.add(_MyExpansionTileItem(width, widget._treeLine + [e],
-            widget._treeLinePosition + [index], e));
+        children.add(_MyExpansionTileItem(width, widget._treeLine + [e], widget._treeLinePosition + [index], e));
         index++;
       });
     }
@@ -277,8 +241,7 @@ class MyAddNewOrEditTaskPageState extends State<MyAddNewOrEditTaskPage> {
   Widget build(BuildContext contexxt) {
     if ((ProcType.EDIT == widget.pt) && (null == widget.selectedTaskEntry)) {
       return Column(children: [
-        Center(
-            child: Text("请选择要修改的任务！", style: TextStyle(fontSize: width / 12))),
+        Center(child: Text("请选择要修改的任务！", style: TextStyle(fontSize: width / 12))),
         RaisedButton(
             child: Text("返回", style: TextStyle(fontSize: width / 18)),
             onPressed: () {
@@ -298,9 +261,7 @@ class MyAddNewOrEditTaskPageState extends State<MyAddNewOrEditTaskPage> {
         minLines: 10,
         decoration: InputDecoration(
           icon: new Icon(Icons.event_note, color: Colors.black),
-          hintText: (ProcType.ADD == widget.pt)
-              ? "任务内容"
-              : widget.selectedTaskEntry.content,
+          hintText: (ProcType.ADD == widget.pt) ? "任务内容" : widget.selectedTaskEntry.content,
           hintStyle: TextStyle(fontSize: width / 22),
         ),
         style: TextStyle(fontSize: width / 25),
@@ -334,7 +295,7 @@ class MyAddNewOrEditTaskPageState extends State<MyAddNewOrEditTaskPage> {
                   setState(() {});
                 }
               },
-            ))
+            )),
       ]),
       Divider(),
     ];
@@ -351,11 +312,9 @@ class MyAddNewOrEditTaskPageState extends State<MyAddNewOrEditTaskPage> {
       ));
     }
 
-    children
-        .add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+    children.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       FlatButton(
-          child: Text("放弃",
-              style: TextStyle(color: Colors.lightBlue, fontSize: width / 25)),
+          child: Text("放弃", style: TextStyle(color: Colors.lightBlue, fontSize: width / 25)),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -370,16 +329,15 @@ class MyAddNewOrEditTaskPageState extends State<MyAddNewOrEditTaskPage> {
               if (null == widget.selectedTaskEntry) {
                 // 添加到该日期下
                 final dateStr = DateFormat("yyyy-MM-dd").format(_dt);
-                var dateTaskRoot = widget.selectedTaskEntry ??
-                    MyGlobalData.data.dateTaskDataMap[dateStr];
+                var dateTaskRoot = widget.selectedTaskEntry ?? MyGlobalData.data.dateTaskDataMap[dateStr];
                 if (null == dateTaskRoot) {
                   dateTaskRoot = MyTaskEntry(dateStr);
                   MyGlobalData.data.dateTaskDataMap[dateStr] = dateTaskRoot;
                 }
-                dateTaskRoot.addChild(newTE);
+                dateTaskRoot.addChildAndRefreshFatherState(newTE);
               } else {
                 // 添加到指定任务下
-                widget.selectedTaskEntry.addChild(newTE);
+                widget.selectedTaskEntry.addChildAndRefreshFatherState(newTE);
               }
             } else if (ProcType.EDIT == widget.pt) {
               //修改任务内容
@@ -412,26 +370,18 @@ class MyDeleteTaskPage extends StatelessWidget {
   Widget build(BuildContext context) {
     if ((null == te) && (null == dt)) {
       return AlertDialog(
-          title: Center(
-              child:
-                  Text("删除任务", style: TextStyle(fontSize: screenWidth / 25))),
+          title: Center(child: Text("删除任务", style: TextStyle(fontSize: screenWidth / 25))),
           content: SingleChildScrollView(
               child: ListBody(children: [
             //Center(child: Text('')),
             Divider(),
-            Center(
-                child: Text('请选择 [日期] ',
-                    style: TextStyle(fontSize: screenWidth / 25))),
-            Center(
-                child: Text('或者 [任务] !',
-                    style: TextStyle(fontSize: screenWidth / 25))),
+            Center(child: Text('请选择 [日期] ', style: TextStyle(fontSize: screenWidth / 25))),
+            Center(child: Text('或者 [任务] !', style: TextStyle(fontSize: screenWidth / 25))),
             Divider(),
           ])),
           actions: [
             FlatButton(
-                child: Container(
-                    child: Text("返回",
-                        style: TextStyle(fontSize: screenWidth / 25))),
+                child: Container(child: Text("返回", style: TextStyle(fontSize: screenWidth / 25))),
                 onPressed: () {
                   Navigator.of(context).pop();
                 })
@@ -443,23 +393,17 @@ class MyDeleteTaskPage extends StatelessWidget {
 
     if ((null == te) && ((null == dateTask) || dateTask.children.isEmpty)) {
       return AlertDialog(
-          title: Center(
-              child:
-                  Text("删除任务", style: TextStyle(fontSize: screenWidth / 25))),
+          title: Center(child: Text("删除任务", style: TextStyle(fontSize: screenWidth / 25))),
           content: SingleChildScrollView(
               child: ListBody(children: [
             //Center(child: Text('')),
             Divider(),
-            Center(
-                child: Text("$dateStr 没有任务",
-                    style: TextStyle(fontSize: screenWidth / 25))),
+            Center(child: Text("$dateStr 没有任务", style: TextStyle(fontSize: screenWidth / 25))),
             Divider(),
           ])),
           actions: [
             FlatButton(
-                child: Container(
-                    child: Text("返回",
-                        style: TextStyle(fontSize: screenWidth / 25))),
+                child: Container(child: Text("返回", style: TextStyle(fontSize: screenWidth / 25))),
                 onPressed: () {
                   Navigator.of(context).pop();
                 })
@@ -468,40 +412,34 @@ class MyDeleteTaskPage extends StatelessWidget {
 
     List<Widget> list = [Divider()];
     if (null != te) {
-      list.add(Text("${te.getDegreeString()}  ${te.content}",
-          style: TextStyle(fontSize: screenWidth / 25)));
+      list.add(Text("${te.getDegreeString()}  ${te.content}", style: TextStyle(fontSize: screenWidth / 25)));
       list.add(Divider());
     } else {
       dateTask.children.forEach((e) {
-        list.add(Text("${e.getDegreeString()}  ${e.content}",
-            style: TextStyle(fontSize: screenWidth / 25)));
+        list.add(Text("${e.getDegreeString()}  ${e.content}", style: TextStyle(fontSize: screenWidth / 25)));
         list.add(Divider());
       });
     }
 
     return AlertDialog(
-        title: Center(
-            child: Text("删除任务", style: TextStyle(fontSize: screenWidth / 25))),
+        title: Center(child: Text("删除任务", style: TextStyle(fontSize: screenWidth / 25))),
         content: SingleChildScrollView(child: ListBody(children: list)),
         actions: [
           FlatButton(
               child: Container(
-                  alignment: Alignment.center,
-                  child:
-                      Text("取消", style: TextStyle(fontSize: screenWidth / 25))),
+                  alignment: Alignment.center, child: Text("取消", style: TextStyle(fontSize: screenWidth / 25))),
               onPressed: () {
                 Navigator.of(context).pop();
               }),
           FlatButton(
               child: Container(
-                  alignment: Alignment.center,
-                  child:
-                      Text("删除", style: TextStyle(fontSize: screenWidth / 25))),
+                  alignment: Alignment.center, child: Text("删除", style: TextStyle(fontSize: screenWidth / 25))),
               onPressed: () {
                 if (null != te) {
-                  te.deleteSelf();
+                  te.deleteSelfAndRefreshFatherState();
+                  MyGlobalData.data.selectedTaskEntry = null;
+                  MyGlobalData.data.selectedExpansionItemState = null;
                 } else {
-                  //MyGlobalData.data.dateTaskDataMap.remove(dateStr);
                   dateTask.children.clear();
                 }
                 MyGlobalData.data.saveTaskDataAndRefreshView();
@@ -529,8 +467,7 @@ class MyTaskActionBar extends StatelessWidget {
               body: MyAddNewOrEditTaskPage(
                   width,
                   ProcType.ADD,
-                  MyGlobalData.data.selectedDate ??
-                      MyGlobalData.data.monthViewShowDate,
+                  MyGlobalData.data.selectedDate ?? MyGlobalData.data.monthViewShowDate,
                   MyGlobalData.data.selectedTaskEntry),
             );
           }));
@@ -544,10 +481,7 @@ class MyTaskActionBar extends StatelessWidget {
               context: context,
               barrierDismissible: false,
               builder: (BuildContext context) {
-                return MyDeleteTaskPage(
-                    width,
-                    MyGlobalData.data.selectedTaskEntry,
-                    MyGlobalData.data.selectedDate);
+                return MyDeleteTaskPage(width, MyGlobalData.data.selectedTaskEntry, MyGlobalData.data.selectedDate);
               });
         }));
 
@@ -561,8 +495,7 @@ class MyTaskActionBar extends StatelessWidget {
                 body: MyAddNewOrEditTaskPage(
                     width,
                     ProcType.EDIT,
-                    MyGlobalData.data.selectedDate ??
-                        MyGlobalData.data.monthViewShowDate,
+                    MyGlobalData.data.selectedDate ?? MyGlobalData.data.monthViewShowDate,
                     MyGlobalData.data.selectedTaskEntry));
           }));
         }));
@@ -580,9 +513,7 @@ class MyTaskActionBar extends StatelessWidget {
 //        height: screenHeight / 14,
         color: Colors.lightBlueAccent,
         alignment: Alignment.bottomCenter,
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: _getActions(screenWidth, context)
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: _getActions(screenWidth, context)
             /*[
           Text('任务月历', style: TextStyle(fontSize: screenWidth / 22)),
           Row(

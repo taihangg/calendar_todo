@@ -47,8 +47,7 @@ class MyGlobalData {
       if (null == month) {
         print("$i null");
       } else {
-        print(
-            "$i ${month.gregorianYear}-${month.gregorianMonth}:${month.monthDaysCount}");
+        print("$i ${month.gregorianYear}-${month.gregorianMonth}:${month.monthDaysCount}");
       }
     }
   }
@@ -154,11 +153,11 @@ class MyGlobalData {
   }
 
   ////////////// 任务视图 //////////////
-  MyTaskViewState taskViewState;
-  MyTaskEntry selectedTaskEntry;
   Map<String, MyTaskEntry> dateTaskDataMap = {};
+  MyTaskViewState taskViewState;
 
-  // for delete
+  // 选择状态，一起更新
+  MyTaskEntry selectedTaskEntry;
   MyExpansionTileItemState selectedExpansionItemState;
 
   ////////////// 文件存储 //////////////
@@ -188,10 +187,9 @@ class MyGlobalData {
   }
 
   saveTaskDataAndRefreshView() async {
-    var jsonStr = json.encode(dateTaskDataMap);
-    await myFile.saveString(jsonStr); // 文件会先被清空，再写入数据
-
     setStateMonthAndTaskView();
+    var jsonStr = await json.encode(dateTaskDataMap);
+    myFile.saveString(jsonStr); // 文件会先被清空，再写入数据
   }
 
   updateSelectDate(DateTime date, bool selected) {
