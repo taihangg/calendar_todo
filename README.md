@@ -3,4 +3,4 @@
 万年历的代码移植自HongchenMeng先生的c#移植项目，地址：https://github.com/HongchenMeng/SharpSxwnl
 感谢许剑伟先生！感谢HongchenMeng先生!
 
-学习项目，比较粗糙。
+学习项目，比较粗糙，还在改进中。
