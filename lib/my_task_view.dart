@@ -162,19 +162,19 @@ class MyExpansionTileItemState extends State<_MyExpansionTileItem> {
     var children = <Widget>[
       Container(
           padding: EdgeInsets.fromLTRB(10.0 * (widget._treeLinePosition.length - 1), 0, 0, 0),
+          color: _selected ? Colors.tealAccent : null,
           child: ListTile(
               leading: leadingIcon,
               title: GestureDetector(
                   child: Container(
-                      color: _selected ? Colors.black12 : null,
                       child: ListTile(
-                        title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          Text(degreeString, style: TextStyle(fontSize: width / 25, color: Colors.orange)),
-                          Text(midStr, style: TextStyle(fontSize: width / 25, color: Colors.orange)),
-                          Text(tailStr, style: TextStyle(fontSize: width / 25, color: Colors.orange)),
-                        ]),
-                        subtitle: Text(entry.content, style: TextStyle(fontSize: width / 20, color: fontColor)),
-                      )),
+                    title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                      Text(degreeString, style: TextStyle(fontSize: width / 25, color: Colors.orange)),
+                      Text(midStr, style: TextStyle(fontSize: width / 25, color: Colors.orange)),
+                      Text(tailStr, style: TextStyle(fontSize: width / 25, color: Colors.orange)),
+                    ]),
+                    subtitle: Text(entry.content, style: TextStyle(fontSize: width / 20, color: fontColor)),
+                  )),
                   onTap: () {
                     _selected = !_selected;
                     if (_selected) {
