@@ -1,12 +1,13 @@
 # task_calendar
-ÈÎÎñtodo ÈÕÀú Å©ÀúËã·¨Ô´×ÔĞí½£Î°ÏÈÉúµÄÊÙĞÇÍòÄêÀú¡£
-ÍòÄêÀúµÄ´úÂëÒÆÖ²×ÔHongchenMengÏÈÉúµÄc#ÒÆÖ²ÏîÄ¿£¬µØÖ·£ºhttps://github.com/HongchenMeng/SharpSxwnl
-¸ĞĞ»Ğí½£Î°ÏÈÉú£¡¸ĞĞ»HongchenMengÏÈÉú!
+ä»»åŠ¡todo æ—¥å† å†œå†ç®—æ³•æºè‡ªè®¸å‰‘ä¼Ÿå…ˆç”Ÿçš„å¯¿æ˜Ÿä¸‡å¹´å†ã€‚
+ä¸‡å¹´å†çš„ä»£ç ç§»æ¤è‡ªHongchenMengå…ˆç”Ÿçš„c#ç§»æ¤é¡¹ç›®ï¼Œåœ°å€ï¼šhttps://github.com/HongchenMeng/SharpSxwnl
+æ„Ÿè°¢è®¸å‰‘ä¼Ÿå…ˆç”Ÿï¼æ„Ÿè°¢HongchenMengå…ˆç”Ÿ!
 
-Ñ§Ï°ÏîÄ¿£¬±È½Ï´Ö²Ú£¬»¹ÔÚ¸Ä½øÖĞ¡£
+å­¦ä¹ é¡¹ç›®ï¼Œæ¯”è¾ƒç²—ç³™ï¼Œè¿˜åœ¨æ”¹è¿›ä¸­ã€‚
+calendaréƒ¨åˆ†å¯ä»¥å‰¥ç¦»å‡ºæ¥å•ç‹¬ä½¿ç”¨ã€‚
 
 ---
 
-Ğ§¹û½ØÍ¼£º
+æ•ˆæœæˆªå›¾ï¼š
 
 ![](https://github.com/taihangg/task_calendar/blob/master/sample_photos/sample1.png)
