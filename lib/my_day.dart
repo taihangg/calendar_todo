@@ -51,11 +51,7 @@ class DayBox extends StatelessWidget {
       this.gregorianColor,
       this.lunarStr,
       this.lunarColor,
-      this.onSelectCallback}) {
-    if (1 == date.day) {
-      print("$date lunarStr=$lunarStr");
-    }
-  }
+      this.onSelectCallback});
 
   @override
   Widget build(BuildContext context) {

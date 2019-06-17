@@ -187,7 +187,7 @@ class MyMonthViewState extends State<MyMonthView> {
       if (dateTask.children.isNotEmpty) {
         if (dateTask.children.length == dateTask.finishedChildCount) {
           _allDone = true;
-          assert((null == dateTask.state) || (true == dateTask.state));
+//          assert((null == dateTask.state) || (true == dateTask.state));
         }
       }
     }

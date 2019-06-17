@@ -37,13 +37,17 @@ class MyTaskEntry {
   }
 
   deleteSelfAndRefreshFatherState() {
+    if (null == _father) {
+      // 在全部任务视图可以选择日级任务，没有父节点
+      return;
+    }
+
     if (false == state) {
-      _father.updateTreeLineState_new(true);
+      updateTreeLineState_new(true);
     } else {
       _father.finishedChildCount--;
     }
 
-    assert(null != _father);
     _father.children.removeAt(_index);
 
     //更新兄弟节点的索引号
@@ -147,8 +151,7 @@ class MyTaskEntry {
 
     showLog() {
       treeLine.forEach((e) {
-        print(
-            "xxx ${e.content} ${e.finishedChildCount}/${e.children.length} ${e.state}");
+        print("xxx ${e.content} ${e.finishedChildCount}/${e.children.length} ${e.state}");
       });
     }
 
@@ -314,20 +317,44 @@ class MyTaskEntry {
   getDegreeString() {
     //return (this._index + 1).toString();
     String degreeString = (this._index + 1).toString();
-    for (var e = this._father;
-        (null != e) && (null != e._father);
-        e = e._father) {
+    for (var e = this._father; (null != e) && (null != e._father); e = e._father) {
       degreeString = (e._index + 1).toString() + "." + degreeString;
     }
     return degreeString;
   }
+
+  static MyTaskEntry getAllDateTask(Map<String, MyTaskEntry> dateTaskDataMap) {
+    var allDateTask = MyTaskEntry("所有任务");
+    var done = <MyTaskEntry>[];
+
+    dateTaskDataMap.forEach((k, v) {
+      allDateTask.children.add(v);
+      if (false != v.state) {
+        allDateTask.finishedChildCount++;
+      } else {
+//        done.add(v);
+      }
+    });
+//    allDateTask.children += done;
+
+    // 按日期排序
+    allDateTask.children.sort((l, r) {
+      return l.content.compareTo(r.content);
+    });
+
+    // 更新一下索引号
+    var i = 0;
+    allDateTask.children.forEach((e) {
+      e._index = i;
+      i++;
+    });
+
+    return allDateTask;
+  }
 }
 
 bool isSameMonth(final DateTime l, final DateTime r) {
-  if ((null != l) &&
-      (null != r) &&
-      (l.year == r.year) &&
-      (l.month == r.month)) {
+  if ((null != l) && (null != r) && (l.year == r.year) && (l.month == r.month)) {
     return true;
   }
   return false;

@@ -49,13 +49,26 @@ class MyTaskViewState extends State<MyTaskView> {
             child: Text("$dateStr 没有计划任务", style: TextStyle(fontSize: width / 15)));
       }
     } else {
-      child = Container(
-          alignment: Alignment.topCenter,
-          margin: EdgeInsets.all(10),
-          child: Column(children: [
-            Text("选中日期", style: TextStyle(fontSize: width / 15)),
-            Text("可查看当日任务", style: TextStyle(fontSize: width / 15))
-          ]));
+      // 显示所有任务
+      var allDateTask = MyTaskEntry.getAllDateTask(MyGlobalData.data.dateTaskDataMap);
+      if (allDateTask.children.isNotEmpty) {
+        child = MyExpansionTileRoot(width, allDateTask);
+      } else {
+        child = Container(
+            alignment: Alignment.topCenter,
+            margin: EdgeInsets.all(10),
+            child: Column(children: [
+              Text("没有任务", style: TextStyle(fontSize: width / 15)),
+            ]));
+      }
+
+//      child = Container(
+//          alignment: Alignment.topCenter,
+//          margin: EdgeInsets.all(10),
+//          child: Column(children: [
+//            Text("选中日期", style: TextStyle(fontSize: width / 15)),
+//            Text("可查看当日任务", style: TextStyle(fontSize: width / 15))
+//          ]));
     }
 
     assert(null != child);
@@ -185,9 +198,12 @@ class MyExpansionTileItemState extends State<_MyExpansionTileItem> {
                       }
                       MyGlobalData.data.selectedTaskEntry = entry;
                       MyGlobalData.data.selectedExpansionItemState = this;
-                      if (!isSameMonth(MyGlobalData.data.monthViewShowDate, MyGlobalData.data.selectedDate)) {
+                      var selectedDate = MyGlobalData.data.selectedDate;
+                      if (!isSameMonth(MyGlobalData.data.monthViewShowDate, selectedDate)) {
                         // 返回选择的任务的日期的月
-                        MyGlobalData.data.updateMonthViewShowDate(MyGlobalData.data.selectedDate);
+                        if (null != selectedDate) {
+                          MyGlobalData.data.updateMonthViewShowDate(selectedDate);
+                        }
                       }
                     } else {
                       MyGlobalData.data.selectedTaskEntry = null;
@@ -338,6 +354,7 @@ class MyAddNewOrEditTaskPageState extends State<MyAddNewOrEditTaskPage> {
               } else {
                 // 添加到指定任务下
                 widget.selectedTaskEntry.addChildAndRefreshFatherState(newTE);
+                widget.selectedTaskEntry.expanded = true;
               }
             } else if (ProcType.EDIT == widget.pt) {
               //修改任务内容
@@ -388,26 +405,33 @@ class MyDeleteTaskPage extends StatelessWidget {
           ]);
     }
 
-    final dateStr = DateFormat("yyyy-MM-dd").format(dt);
-    var dateTask = MyGlobalData.data.dateTaskDataMap[dateStr];
+    assert((null != te) || (null != dt));
 
-    if ((null == te) && ((null == dateTask) || dateTask.children.isEmpty)) {
-      return AlertDialog(
-          title: Center(child: Text("删除任务", style: TextStyle(fontSize: screenWidth / 25))),
-          content: SingleChildScrollView(
-              child: ListBody(children: [
-            //Center(child: Text('')),
-            Divider(),
-            Center(child: Text("$dateStr 没有任务", style: TextStyle(fontSize: screenWidth / 25))),
-            Divider(),
-          ])),
-          actions: [
-            FlatButton(
-                child: Container(child: Text("返回", style: TextStyle(fontSize: screenWidth / 25))),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                })
-          ]);
+    MyTaskEntry dateTask;
+    if (null == te) {
+      // 没有选中的任务，就要删除当日的所有任务
+      final dateStr = DateFormat("yyyy-MM-dd").format(dt);
+      dateTask = MyGlobalData.data.dateTaskDataMap[dateStr];
+
+      if ((null == dateTask) || dateTask.children.isEmpty) {
+        // 如果当日也没有任务，就返回
+        return AlertDialog(
+            title: Center(child: Text("删除任务", style: TextStyle(fontSize: screenWidth / 25))),
+            content: SingleChildScrollView(
+                child: ListBody(children: [
+              //Center(child: Text('')),
+              Divider(),
+              Center(child: Text("$dateStr 没有任务", style: TextStyle(fontSize: screenWidth / 25))),
+              Divider(),
+            ])),
+            actions: [
+              FlatButton(
+                  child: Container(child: Text("返回", style: TextStyle(fontSize: screenWidth / 25))),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  }),
+            ]);
+      }
     }
 
     List<Widget> list = [Divider()];
@@ -436,6 +460,7 @@ class MyDeleteTaskPage extends StatelessWidget {
                   alignment: Alignment.center, child: Text("删除", style: TextStyle(fontSize: screenWidth / 25))),
               onPressed: () {
                 if (null != te) {
+                  // 删除选择任务自己，不需要通知别的选择任务修改选中状态
                   te.deleteSelfAndRefreshFatherState();
                   MyGlobalData.data.selectedTaskEntry = null;
                   MyGlobalData.data.selectedExpansionItemState = null;
