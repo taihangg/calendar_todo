@@ -1,11 +1,16 @@
 import 'dart:ui';
 
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
-import 'my_global_data.dart';
-import 'my_month_task_page.dart';
+import 'month_todo_page.dart';
 import 'my_navigation_bar.dart';
-import 'my_weather_view.dart';
+import 'weather_view.dart';
+
+import 'month_view.dart';
+import 'global_data.dart';
+
+import 'package:flutter_sparkline/flutter_sparkline.dart';
 
 void main() {
   print("xxx main");
@@ -18,8 +23,6 @@ void main() {
   double _pixelRatio = mediaQuery.devicePixelRatio;
   print("$_width $_height $_topbarH $_botbarH $_pixelRatio");
 
-  MyGlobalData.data.updateMonthViewShowDate(DateTime.now());
-
   runApp(MyApp());
 }
 
@@ -31,25 +34,25 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: _MyHomePage(),
+      home: _HomePage(),
     );
   }
 }
 
-class _MyHomePage extends StatefulWidget {
-  _MyHomePage({Key key}) : super(key: key);
+class _HomePage extends StatefulWidget {
+  _HomePage({Key key}) : super(key: key);
 
   @override
   createState() {
-    return _MyHomePageState();
+    return _HomePageState();
   }
 }
 
-class _MyHomePageState extends State<_MyHomePage> {
+class _HomePageState extends State<_HomePage> {
   double _screenWidth;
   double _screenHeight;
 
-  _MyHomePageState() {
+  _HomePageState() {
     MediaQueryData mediaQuery = MediaQueryData.fromWindow(window);
     _screenWidth = mediaQuery.size.width;
     _screenHeight = mediaQuery.size.height;
@@ -60,12 +63,12 @@ class _MyHomePageState extends State<_MyHomePage> {
     switch (_bottomBarSelectIndex) {
       case 0:
         {
-          return MyMonthViewPage(_screenWidth, _screenHeight);
+          return MonthTaskPage(_screenWidth, _screenHeight);
           break;
         }
       case 1:
         {
-          return MyWeatherPage(_screenWidth);
+          return WeatherPage(_screenWidth);
           break;
         }
 
@@ -88,7 +91,7 @@ class _MyHomePageState extends State<_MyHomePage> {
           }
         }));
 
-    var myTabBar = TabBar(isScrollable: false, tabs: [
+    var tabBar = TabBar(isScrollable: false, tabs: [
       Tab(
 //        text: "日历",
         icon: Icon(Icons.border_all, size: _screenWidth / 15),
@@ -100,19 +103,47 @@ class _MyHomePageState extends State<_MyHomePage> {
 //        child: Text("天气", style: TextStyle(fontSize: _screenWidth / 15)),
       )
     ]);
-    var myAppBar = AppBar(
+    var appBar = AppBar(
       //leading: Text('Tabbed AppBar'),
       //title: const Text('Tabbed AppBar'),
-      title: myTabBar,
+      title: tabBar,
 //      bottom: myTabBar,
     );
 
-    var myTabBarView = TabBarView(
+    NoteIconType _noteIconTypeFn(DateTime date) {
+      final fmt = DateFormat('yyyy-MM-dd');
+
+      final dateStr = fmt.format(date);
+      final dateTask = globalData.dateTaskDataMap[dateStr];
+      if ((null == dateTask) || (dateTask.children.isEmpty)) {
+        return NoteIconType.none;
+      }
+
+      if (dateTask.children.length == dateTask.finishedChildCount) {
+        return NoteIconType.grey;
+      }
+
+      return NoteIconType.colorful;
+    }
+
+    var tabBarView = TabBarView(
       children: [
-        MyMonthViewPage(_screenWidth, _screenHeight),
-        MyWeatherPage(_screenWidth),
+        MonthTaskPage(_screenWidth, _screenHeight),
+        WeatherPage(_screenWidth),
       ],
     );
+
+//    return MonthView(
+//      width: _screenWidth,
+//      onDateSelectedFn: (DateTime selectedDate) {
+//        globalData.selectedDate = selectedDate;
+//      },
+//      onMonthChangeFn: (DateTime showMonth) {
+//        globalData.monthViewShowDate = showMonth;
+//      },
+//      initDate: null,
+//      noteIconTypeFn: _noteIconTypeFn,
+//    );
 
     return DefaultTabController(
       length: 2,
@@ -120,9 +151,9 @@ class _MyHomePageState extends State<_MyHomePage> {
         /*appBar: (0 == _bottomBarSelectIndex)
           ? MyTaskActionBar.makeAppBar(_screenWidth, context)
           : null,*/
-        appBar: myAppBar,
+        appBar: appBar,
 //      body: _getBody(),
-        body: myTabBarView,
+        body: tabBarView,
 //      bottomNavigationBar: bottomNavigateBar,
       ),
     );
