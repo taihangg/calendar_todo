@@ -92,7 +92,7 @@ class MonthViewActionBar extends StatelessWidget {
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
                 return Scaffold(
-                  appBar: AppBar(title: Text('添加节日')),
+                  appBar: AppBar(title: Text('自定义节日')),
                   body: FestirvalEditor(getFestivalText(), onSaveFn),
                 );
               }));
