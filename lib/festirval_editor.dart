@@ -157,10 +157,10 @@ L0.-1/#FF8C00/十斋日
           height: _width / 40,
         ),
         _buildTextInput(),
-//        SizedBox(
-//          width: _width / 40,
-//          height: _width / 40,
-//        ),
+        SizedBox(
+          width: _width / 40,
+          height: _width / 40,
+        ),
         _buildButtonRow(),
       ],
     );
