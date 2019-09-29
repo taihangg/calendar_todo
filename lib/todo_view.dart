@@ -19,6 +19,12 @@ class TodoView extends StatefulWidget {
     }
   }
 
+  Refresh() {
+    if ((null != _taskViewState) && (_taskViewState.mounted)) {
+      _taskViewState.setState(() {});
+    }
+  }
+
   TodoViewState _taskViewState;
 
   @override
@@ -408,7 +414,7 @@ enum ProcType {
 class AddNewOrEditTaskPage extends StatefulWidget {
   final double width;
   final ProcType procType;
-  final DateTime date;
+  DateTime date;
   final TaskEntry selectedTaskEntry;
   final Function() onActionDoneFn;
 
@@ -419,6 +425,10 @@ class AddNewOrEditTaskPage extends StatefulWidget {
     this.selectedTaskEntry,
     this.onActionDoneFn,
   }) {
+    if (null == this.date) {
+      this.date = DateTime.now();
+    }
+
     assert(null != date);
   }
 

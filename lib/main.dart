@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '任务月历',
+      title: '月历任务',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -91,25 +91,6 @@ class _HomePageState extends State<_HomePage> {
           }
         }));
 
-    var tabBar = TabBar(isScrollable: false, tabs: [
-      Tab(
-//        text: "日历",
-        icon: Icon(Icons.border_all, size: _screenWidth / 15),
-//        child: Text("日历", style: TextStyle(fontSize: _screenWidth / 15)),
-      ),
-      Tab(
-//          text: "天气",
-        icon: Icon(Icons.wb_sunny, size: _screenWidth / 15),
-//        child: Text("天气", style: TextStyle(fontSize: _screenWidth / 15)),
-      )
-    ]);
-    var appBar = AppBar(
-      //leading: Text('Tabbed AppBar'),
-      //title: const Text('Tabbed AppBar'),
-      title: tabBar,
-//      bottom: myTabBar,
-    );
-
     NoteIconType _noteIconTypeFn(DateTime date) {
       final fmt = DateFormat('yyyy-MM-dd');
 
@@ -126,12 +107,22 @@ class _HomePageState extends State<_HomePage> {
       return NoteIconType.colorful;
     }
 
-    var tabBarView = TabBarView(
-      children: [
-        MonthTaskPage(_screenWidth, _screenHeight),
-        WeatherPage(_screenWidth),
-      ],
-    );
+    List<Tab> tabList = [
+      Tab(
+//        text: "日历",
+        icon: Icon(Icons.border_all, size: _screenWidth / 15),
+//        child: Text("日历", style: TextStyle(fontSize: _screenWidth / 15)),
+      ),
+      Tab(
+//          text: "天气",
+        icon: Icon(Icons.wb_sunny, size: _screenWidth / 15),
+//        child: Text("天气", style: TextStyle(fontSize: _screenWidth / 15)),
+      ),
+    ];
+    List<Widget> tabBarViewChildren = [
+      MonthTaskPage(_screenWidth, _screenHeight),
+      WeatherPage(_screenWidth),
+    ];
 
 //    return MonthView(
 //      width: _screenWidth,
@@ -151,9 +142,14 @@ class _HomePageState extends State<_HomePage> {
         /*appBar: (0 == _bottomBarSelectIndex)
           ? MyTaskActionBar.makeAppBar(_screenWidth, context)
           : null,*/
-        appBar: appBar,
+        appBar: AppBar(
+          //leading: Text('Tabbed AppBar'),
+          //title: const Text('Tabbed AppBar'),
+          title: TabBar(isScrollable: false, tabs: tabList),
+//      bottom: myTabBar,
+        ),
 //      body: _getBody(),
-        body: tabBarView,
+        body: TabBarView(children: tabBarViewChildren),
 //      bottomNavigationBar: bottomNavigateBar,
       ),
     );

@@ -3,19 +3,23 @@ import 'dart:ui';
 
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'calendar/sxwnl_Lunar.dart';
+import 'sxwnl/sxwnl_Lunar.dart';
 import 'day.dart';
+import 'package:gzx_dropdown_menu/gzx_dropdown_menu.dart';
+import 'festirval_editor.dart';
+import 'month_view_action_bar.dart';
+import 'user_defined_festival_manager.dart';
 
 Future<void> showLunarDatePickerDialog({
   @required BuildContext context,
   @required Function(DateTime dt) fn,
   DateTime initialDate,
-  double width,
 }) async {
-  final _width = width ?? MediaQueryData.fromWindow(window).size.width;
+  final _width = MediaQueryData.fromWindow(window).size.width;
   DateTime _selectedDt = initialDate ?? DateTime.now();
 
   showDialog(
@@ -33,7 +37,6 @@ Future<void> showLunarDatePickerDialog({
           child: SimpleDialog(
             children: <Widget>[
               MonthView(
-                width: _width,
                 onDateSelectedFn: (DateTime selectedDate) {
                   _selectedDt = selectedDate;
                 },
@@ -44,7 +47,6 @@ Future<void> showLunarDatePickerDialog({
               ),
               Container(
                 color: Colors.white,
-                width: _width,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -91,25 +93,25 @@ enum NoteIconType {
 }
 
 class MonthView extends StatefulWidget {
-  double width;
-  DateTime _showDate;
-  _MonthViewDateInfo _monthViewDate;
-  DateTime _selectedDate;
   final Function(DateTime selectedDate) onDateSelectedFn;
   final Function(DateTime showMonth) onMonthChangeFn;
   final NoteIconType Function(DateTime date) noteIconTypeFn;
-
   MonthView({
-    this.width,
     this.onDateSelectedFn,
     this.onMonthChangeFn,
     this.noteIconTypeFn,
     initDate,
   }) {
     _setShowDate(initDate ?? DateTime.now());
-
-    this._selectedDate = initDate;
+    _selectedDate = initDate;
   }
+
+  UserDefinedFestivalManager _userDefinedFestivalMgr =
+      UserDefinedFestivalManager();
+
+  DateTime _showDate;
+  _MonthViewDateInfo _monthViewDate;
+  DateTime _selectedDate;
 
   _setShowDate(DateTime date) {
     this._showDate = date;
@@ -118,10 +120,10 @@ class MonthView extends StatefulWidget {
 
   setShowMonth(DateTime month) {
     _setShowDate(month);
-    refresh();
+    Refresh();
   }
 
-  refresh() {
+  Refresh() {
     if ((null != _monthViewState) && (_monthViewState.mounted)) {
       _monthViewState.setState(() {});
     }
@@ -134,18 +136,18 @@ class MonthView extends StatefulWidget {
 
   @override
   State<MonthView> createState() {
-    _monthViewState = MonthViewState(this.width);
+    _monthViewState = MonthViewState();
 
     return _monthViewState;
   }
 }
 
 class MonthViewState extends State<MonthView> {
-  final double screenWidth;
+  final double _width = MediaQueryData.fromWindow(window).size.width;
 
   Function(DateTime, bool) _onDaySelectedFn;
 
-  MonthViewState(this.screenWidth) {
+  MonthViewState() {
     _onDaySelectedFn = (DateTime date, bool selected) {
       widget._selectedDate = selected ? date : null;
       widget.onDateSelectedFn(widget._selectedDate);
@@ -176,9 +178,11 @@ class MonthViewState extends State<MonthView> {
   LunarMonth _getMonthLunar(DateTime month) {
     final monthStr = widget._monthFmt.format(month);
 
-    var lunar = widget._lunars[monthStr];
+    LunarMonth lunar = widget._lunars[monthStr];
     if (null == lunar) {
       lunar = LunarMonth(month);
+//      print(
+//          "${lunar.days[0].lunarMonthName}:${lunar.days[0].lunarMonth}:${lunar.days[0].lunarMonthDayCount}");
       widget._lunars[monthStr] = lunar;
       return lunar;
       Future(() {
@@ -191,150 +195,203 @@ class MonthViewState extends State<MonthView> {
 
   List<TitleDay> _weekdayList(int firstWeekday) {
     List<TitleDay> _list = List.generate(7, (int index) {
-      return TitleDay(((index + firstWeekday - 1) % 7) + 1, this.screenWidth);
+      return TitleDay(((index + firstWeekday - 1) % 7) + 1, this._width);
     });
     return _list;
+  }
+
+  List<TextSpan> _getUserDefinedGregorianFestival(
+      int month, int day, int monthDaysCount) {
+    List<TextSpan> all = [];
+
+    final festivalList = widget._userDefinedFestivalMgr
+        .getGregorianFestival(month, day, monthDaysCount);
+
+    festivalList.forEach((Festival festival) {
+      all.addAll([
+        TextSpan(text: festival.text, style: TextStyle(color: festival.color)),
+        TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+      ]);
+    });
+
+    return all;
+  }
+
+  List<TextSpan> _getUserDefinedLunarFestival(
+      int month, int day, int monthDaysCount) {
+    List<TextSpan> all = [];
+
+    final festivalList = widget._userDefinedFestivalMgr
+        .getLunarFestival(month, day, monthDaysCount);
+
+    festivalList.forEach((Festival festival) {
+      all.addAll([
+        TextSpan(text: festival.text, style: TextStyle(color: festival.color)),
+        TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+      ]);
+    });
+
+    return all;
+  }
+
+  void _prepareNoteStr(LunarMonth lunarMonth, _MonthInfo monthInfo, int day,
+      List<TextSpan> lunarStrs, List<TextSpan> gregorianStrs) {
+    if (null == lunarMonth) {
+      return;
+    }
+
+    assert((lunarMonth.monthDaysCount == monthInfo.daysCount) &&
+        (lunarMonth.gregorianMonth == monthInfo.month) &&
+        (lunarMonth.gregorianYear == monthInfo.year));
+    var lunarDayInfo = lunarMonth.days[day - 1];
+
+    //农历信息+
+    lunarStrs.clear();
+    if (1 == lunarDayInfo.lunarDay) {
+      //农历月份
+      lunarStrs.addAll([
+        TextSpan(
+            text: lunarDayInfo.lunarMonthName,
+            style: TextStyle(color: Colors.orange)),
+        TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+      ]);
+//      lunarStrs.addAll([
+//        TextSpan(text: ".", style: TextStyle(color: Colors.grey)),
+//        TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+//      ]);
+    }
+
+    //农历日期
+    lunarStrs.addAll([
+      TextSpan(
+          text: lunarDayInfo.lunarDayName,
+          style: TextStyle(color: Colors.grey)),
+      TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+    ]);
+
+    if ("" != lunarDayInfo.lunarFestival) {
+//      lunarStrs.addAll([
+//        TextSpan(text: ".", style: TextStyle(color: Colors.grey)),
+//        TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+//      ]);
+      //农历节日
+      lunarStrs.addAll([
+        TextSpan(
+            text: lunarDayInfo.lunarFestival,
+            style: TextStyle(color: Colors.blue)),
+        TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+      ]);
+    }
+    lunarStrs.addAll(_getUserDefinedLunarFestival(lunarDayInfo.month,
+        lunarDayInfo.lunarDay, lunarDayInfo.lunarMonthDayCount));
+
+    if (lunarStrs.isNotEmpty) {
+      lunarStrs.removeLast();
+    }
+
+    //公历信息
+    gregorianStrs.clear();
+    if (1 == lunarDayInfo.day) {
+      gregorianStrs.addAll([
+        TextSpan(
+            text: "${monthInfo.month}月",
+            style: TextStyle(color: Colors.orange)),
+        TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+      ]);
+    }
+
+    if ("" != lunarDayInfo.jieqi) {
+      if (gregorianStrs.isNotEmpty) {
+//        gregorianStrs.addAll([
+//          TextSpan(text: ".", style: TextStyle(color: Colors.grey)),
+//          TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+//        ]);
+      }
+      //节气
+      gregorianStrs.addAll([
+        TextSpan(text: lunarDayInfo.jieqi, style: TextStyle(color: Colors.red)),
+        TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+      ]);
+    }
+    if ("" != lunarDayInfo.gregorianFestival) {
+      if (gregorianStrs.isNotEmpty) {
+//        gregorianStrs.addAll([
+//          TextSpan(text: ".", style: TextStyle(color: Colors.grey)),
+//          TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+//        ]);
+      }
+      //公历节日
+      gregorianStrs.addAll([
+        TextSpan(
+          text: lunarDayInfo.gregorianFestival,
+          style: TextStyle(color: Colors.orange),
+        ),
+        TextSpan(text: ",", style: TextStyle(color: Colors.grey)),
+      ]);
+    }
+    gregorianStrs.addAll(_getUserDefinedGregorianFestival(
+        monthInfo.month, day, monthInfo.daysCount));
+
+    if (gregorianStrs.isNotEmpty) {
+      gregorianStrs.removeLast();
+    }
+  }
+
+  List<DayBox> _generateDays(_MonthInfo monthInfo, LunarMonth lunarMonth,
+      bool baskgroundGrey, DateTime today) {
+    List<DayBox> days = [];
+
+    for (int index = 0, day = monthInfo.firstShowDay;
+        index < monthInfo.showCount;
+        index++, day++) {
+      final date = DateTime(monthInfo.year, monthInfo.month, day);
+      final selected = _isSameDay(date, widget._selectedDate);
+      final isToday = _isSameDay(date, today);
+      List<TextSpan> lunarStrs = [], gregorianStrs = [];
+      _prepareNoteStr(lunarMonth, monthInfo, day, lunarStrs, gregorianStrs);
+
+      final noteIconType = widget.noteIconTypeFn(date);
+      assert(null != noteIconType);
+
+      days.add(DayBox(date, _width,
+          showNoteIcon: (noteIconType != NoteIconType.none),
+          noteActive: (noteIconType == NoteIconType.colorful),
+          selected: selected,
+          isToday: isToday,
+          baskgroundGrey: baskgroundGrey,
+          gregorianStrs: gregorianStrs,
+          lunarStrs: lunarStrs,
+          onSelectCallback: _onDaySelectedFn));
+    }
+
+    return days;
   }
 
   List<DayBox> _dayList(final _MonthViewDateInfo _monthViewDate) {
     List<DayBox> _list = [];
 
-    LunarMonth lunar;
-    String lunarStr, gregorianStr;
-    Color lunarColor, gregorianColor;
+    final today = DateTime.now();
     _MonthInfo monthInfo;
-    bool showGregorianMonth;
-    bool showLunarMonth;
-    int day;
-    getNoteStr() {
-      lunarStr = null;
-      lunarColor = null;
-      gregorianStr = null;
-      gregorianColor = null;
-      if (null != lunar) {
-        assert((lunar.monthDaysCount == monthInfo.daysCount) &&
-            (lunar.gregorianMonth == monthInfo.month) &&
-            (lunar.gregorianYear == monthInfo.year));
-        var lunarDayInfo = lunar.days[day - 1];
+    LunarMonth lunarMonth;
+    List<DayBox> days;
 
-        if (0 == lunarDayInfo.lunarDayIndex) {
-          showLunarMonth = false;
-        }
-
-        //农历信息+
-        if ("" != lunarDayInfo.lunarFestival) {
-          //农历节日
-          lunarStr = lunarDayInfo.lunarFestival;
-          lunarColor = Colors.orange;
-        } else if (true != showLunarMonth) {
-          //农历月首日
-          lunarStr = lunarDayInfo.lunarMonthName;
-          lunarColor = Colors.orange;
-          showLunarMonth = true;
-        } else {
-          //农历日期
-          lunarStr = lunarDayInfo.lunarDayName;
-        }
-
-        //公历信息
-        if ("" != lunarDayInfo.jieqi) {
-          //节气
-          gregorianStr = lunarDayInfo.jieqi;
-          gregorianColor = Colors.red;
-        } else if ("" != lunarDayInfo.gregorianFestival) {
-          //公历节日
-          gregorianStr = lunarDayInfo.gregorianFestival;
-          gregorianColor = Colors.orange;
-        } else if (true != showGregorianMonth) {
-          gregorianStr = "${monthInfo.month}月";
-          gregorianColor = Colors.orange;
-          showGregorianMonth = true;
-        }
-      }
-    }
-
-    // last month
-    showGregorianMonth = false;
-
+    // previous month
     monthInfo = _monthViewDate.data[0];
-    lunar = _getMonthLunar(DateTime(monthInfo.year, monthInfo.month));
-    day = monthInfo.firstShowDay;
-    for (int index = 0; index < monthInfo.showCount; index++, day++) {
-      var date = DateTime(monthInfo.year, monthInfo.month, day);
-      var selected = _isSameDay(date, widget._selectedDate);
-
-      getNoteStr();
-
-      final noteIconType = widget.noteIconTypeFn(date);
-      assert(null != noteIconType);
-
-      _list.add(DayBox(date, screenWidth,
-          showNoteIcon: (noteIconType != NoteIconType.none),
-          noteActive: (noteIconType == NoteIconType.colorful),
-          selected: selected,
-          baskgroundGrey: true,
-          gregorianStr: gregorianStr,
-          gregorianColor: gregorianColor,
-          lunarStr: lunarStr,
-          lunarColor: lunarColor,
-          onSelectCallback: _onDaySelectedFn));
-    }
+    lunarMonth = _getMonthLunar(DateTime(monthInfo.year, monthInfo.month));
+    days = _generateDays(monthInfo, lunarMonth, true, today);
+    _list.addAll(days);
 
     // current month
-    showGregorianMonth = false;
-
     monthInfo = _monthViewDate.data[1];
-    lunar = _getMonthLunar(DateTime(monthInfo.year, monthInfo.month));
-    var dt = _monthViewDate.dt;
-    var today = DateTime.now();
-    day = monthInfo.firstShowDay;
-    for (var index = 0; index < monthInfo.showCount; index++, day++) {
-      var date = DateTime(monthInfo.year, monthInfo.month, day);
-      var selected = _isSameDay(date, widget._selectedDate);
-      var isToday = _isSameDay(date, today);
-
-      getNoteStr();
-
-      final noteIconType = widget.noteIconTypeFn(date);
-      assert(null != noteIconType);
-
-      _list.add(DayBox(date, screenWidth,
-          showNoteIcon: (noteIconType != NoteIconType.none),
-          noteActive: (noteIconType == NoteIconType.colorful),
-          selected: selected,
-          isToday: isToday,
-          gregorianStr: gregorianStr,
-          gregorianColor: gregorianColor,
-          lunarStr: lunarStr,
-          lunarColor: lunarColor,
-          onSelectCallback: _onDaySelectedFn));
-    }
+    lunarMonth = _getMonthLunar(DateTime(monthInfo.year, monthInfo.month));
+    days = _generateDays(monthInfo, lunarMonth, false, today);
+    _list.addAll(days);
 
     // next month
-    showGregorianMonth = false;
     monthInfo = _monthViewDate.data[2];
-    lunar = _getMonthLunar(DateTime(monthInfo.year, monthInfo.month));
-    day = monthInfo.firstShowDay;
-    for (var index = 0; index < monthInfo.showCount; index++, day++) {
-      var date = DateTime(monthInfo.year, monthInfo.month, day);
-      var selected = _isSameDay(date, widget._selectedDate);
-
-      getNoteStr();
-
-      final noteIconType = widget.noteIconTypeFn(date);
-      assert(null != noteIconType);
-
-      _list.add(DayBox(date, screenWidth,
-          showNoteIcon: (noteIconType != NoteIconType.none),
-          noteActive: (noteIconType == NoteIconType.colorful),
-          selected: selected,
-          baskgroundGrey: true,
-          gregorianStr: gregorianStr,
-          gregorianColor: gregorianColor,
-          lunarStr: lunarStr,
-          lunarColor: lunarColor,
-          onSelectCallback: _onDaySelectedFn));
-    }
+    lunarMonth = _getMonthLunar(DateTime(monthInfo.year, monthInfo.month));
+    days = _generateDays(monthInfo, lunarMonth, true, today);
+    _list.addAll(days);
 
     assert(
         (28 == _list.length) || (35 == _list.length) || (42 == _list.length));
@@ -386,19 +443,31 @@ class MonthViewState extends State<MonthView> {
         mainAxisSize: MainAxisSize.min,
         children: [
           MonthViewActionBar(
-            screenWidth: screenWidth,
-            showMonth: widget._showDate,
-            onMonthChangeFn: (DateTime month) {
-              widget._setShowDate(month);
-              widget.onMonthChangeFn(month);
+            screenWidth: _width,
+            showMonth: widget._selectedDate ?? widget._showDate,
+            onDateChangeFn: (DateTime day) {
+              widget._setShowDate(day);
+              widget.onMonthChangeFn(day);
+
+              if (null != widget._selectedDate) {
+                widget.onDateSelectedFn(day);
+                widget._selectedDate = day;
+              }
               setState(() {});
+            },
+            getFestivalText: () {
+              return widget._userDefinedFestivalMgr.text;
+            },
+            onSaveFn: (String newText) {
+              return widget._userDefinedFestivalMgr.setText(newText);
+//              setState(() {});
             },
           ),
           Container(
-            width: screenWidth / 9 * 8,
-//            height: screenWidth / 9 * 8,
-            margin: EdgeInsets.all(screenWidth / 50),
-            padding: EdgeInsets.all(screenWidth / 50),
+            width: _width * 8 / 9,
+//            height: screenWidth  * 8/ 9,
+            margin: EdgeInsets.all(_width / 50),
+            padding: EdgeInsets.all(_width / 50),
             decoration: BoxDecoration(
 //              color: Colors.red,
               border: Border.all(width: 1.0, color: Colors.black38),
@@ -410,114 +479,6 @@ class MonthViewState extends State<MonthView> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class MonthViewActionBar extends StatelessWidget {
-  final double screenWidth;
-  DateTime showMonth;
-  final Function(DateTime month) onMonthChangeFn;
-  MonthViewActionBar(
-      {this.screenWidth, this.showMonth, this.onMonthChangeFn}) {}
-
-  @override
-  Widget build(BuildContext context) {
-    var rowChildren = <Widget>[];
-
-    rowChildren.add(
-      Container(
-        //color: Colors.orange,
-        child: RaisedButton(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(child: Icon(Icons.arrow_back_ios)),
-              Text("上一月", style: TextStyle(fontSize: screenWidth / 25)),
-            ],
-          ),
-          onPressed: () {
-            final lastMonth = DateTime(showMonth.year, showMonth.month - 1, 1);
-            onMonthChangeFn(lastMonth);
-          },
-        ),
-      ),
-    );
-//
-    rowChildren.add(Container(
-      //alignment: Alignment.center,
-      //padding: EdgeInsets.fromLTRB(screenWidth / 100, 0, screenWidth / 100, 0),
-//      color: Colors.lightBlueAccent,
-      child: RaisedButton(
-        color: Colors.lightBlueAccent,
-        child: Text(
-          "${showMonth.year} 年 ${showMonth.month}月",
-          style: TextStyle(fontSize: screenWidth / 20, color: Colors.black),
-        ),
-        onPressed: () async {
-          var pickDate = await showDatePicker(
-              context: context,
-              initialDate: showMonth,
-              firstDate: DateTime(1900),
-              lastDate: DateTime(2100),
-              locale: Localizations.localeOf(context));
-
-          if (null != pickDate) {
-            onMonthChangeFn(pickDate);
-          }
-        },
-      ),
-    ));
-
-    rowChildren.add(
-      Container(
-        //margin: EdgeInsets.fromLTRB(0, 0, screenWidth / 100, 0),
-        width: screenWidth / 10,
-        child: FloatingActionButton(
-          backgroundColor: Colors.yellowAccent,
-          child: Text("今",
-              style: TextStyle(
-                  color: Colors.lightBlue, fontSize: screenWidth / 15)),
-          onPressed: () {
-            onMonthChangeFn(DateTime.now());
-          },
-        ),
-      ),
-    );
-
-    rowChildren.add(
-      Container(
-//        color: Colors.orange,
-        child: RaisedButton(
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text("下一月", style: TextStyle(fontSize: screenWidth / 25)),
-            Icon(Icons.arrow_forward_ios),
-          ]),
-          onPressed: () {
-            final nextMonth = DateTime(showMonth.year, showMonth.month + 1, 1);
-            onMonthChangeFn(nextMonth);
-          },
-        ),
-      ),
-    );
-
-    return FittedBox(
-      child: Container(
-        width: screenWidth / 9 * 8,
-        margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-        decoration: BoxDecoration(
-          //color: Colors.redAccent,
-          border: Border.all(width: 0.5, color: Colors.black38),
-//          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-        ),
-        child: FittedBox(
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: rowChildren),
-        ),
       ),
     );
   }

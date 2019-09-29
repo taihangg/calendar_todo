@@ -67,9 +67,9 @@ class WeatherData {
 
   _parseDateData(String data) {
     // <td width="20%">2019-5-19 星期日</td>
-    var dateRE =
+    final dateRE =
         RegExp(r'<td[^>]*>([\d]{4})-([\d]{1,2})-([\d]{1,2}) ([^<]*)</td>');
-    var dateMatches = dateRE.allMatches(data);
+    final dateMatches = dateRE.allMatches(data);
 
     var i = 0;
     for (var match in dateMatches) {

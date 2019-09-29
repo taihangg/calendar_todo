@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marquee_flutter/marquee_flutter.dart';
 
 class TitleDay extends StatelessWidget {
   final double screenWidth;
@@ -40,10 +41,8 @@ class DayBox extends StatelessWidget {
   final bool selected;
   final bool baskgroundGrey;
   final bool isToday;
-  final String gregorianStr;
-  final Color gregorianColor;
-  final String lunarStr;
-  final Color lunarColor;
+  final List<TextSpan> gregorianStrs;
+  final List<TextSpan> lunarStrs;
   final Function(DateTime, bool) onSelectCallback;
 
   DayBox(this.date, this.screenWidth,
@@ -52,16 +51,33 @@ class DayBox extends StatelessWidget {
       this.selected = false,
       this.baskgroundGrey = false,
       this.isToday = false,
-      this.gregorianStr,
-      this.gregorianColor,
-      this.lunarStr,
-      this.lunarColor,
+      this.gregorianStrs,
+      this.lunarStrs,
       this.onSelectCallback});
+
+  Widget _buildText(List<TextSpan> strs, AlignmentGeometry alignment) {
+    int length = 0;
+    strs.forEach((var e) {
+      length += e.text.length;
+    });
+    final richText = RichText(text: TextSpan(children: strs));
+
+    return Container(
+        alignment: alignment,
+        child: (length < 5)
+            ? richText
+            : Container(
+                width: screenWidth / 8,
+                height: screenWidth / 8 / 3,
+                child: MarqueeWidget(
+                  richText: richText,
+                  scrollAxis: Axis.horizontal,
+                  ratioOfBlankToScreen: 0.05,
+                )));
+  }
 
   @override
   Widget build(BuildContext context) {
-    //print("xxx _DayBox build ${date.day}");
-
     Color backgroundColor;
     if (true == isToday) {
       backgroundColor = selected ? Colors.yellowAccent : Colors.yellow;
@@ -99,21 +115,12 @@ class DayBox extends StatelessWidget {
     }
 
     // 需要显示月份的情况
-    if (null != gregorianStr) {
-      stackChildren.add(Container(
-          alignment: Alignment.topCenter,
-          child: Text(gregorianStr,
-              style: TextStyle(
-                  color: gregorianColor ?? Colors.grey,
-                  fontSize: screenWidth / 33))));
+    if (null != gregorianStrs) {
+      stackChildren.add(_buildText(gregorianStrs, Alignment.topCenter));
     }
-    if (null != lunarStr) {
-      stackChildren.add(Container(
-          alignment: Alignment.bottomCenter,
-          child: Text(lunarStr,
-              style: TextStyle(
-                  color: lunarColor ?? Colors.grey[600],
-                  fontSize: screenWidth / 33))));
+
+    if (null != lunarStrs) {
+      stackChildren.add(_buildText(lunarStrs, Alignment.bottomCenter));
     }
 
     return GestureDetector(

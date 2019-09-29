@@ -22,11 +22,9 @@ class MonthTaskPageState extends State<MonthTaskPage>
   final double screenWidth;
   final double screenHeight;
   MonthView _monthView;
-  DateTime _selectedDate;
   TodoView _todoView;
   MonthTaskPageState(this.screenWidth, this.screenHeight) {
     _monthView = MonthView(
-      width: screenWidth,
       onDateSelectedFn: (DateTime selectedDate) {
         _todoView.setSelectedDate(selectedDate);
       },
@@ -38,7 +36,7 @@ class MonthTaskPageState extends State<MonthTaskPage>
     _todoView = TodoView(
         width: screenWidth,
         onStatusChangeFn: () {
-          _monthView.refresh();
+          _monthView.Refresh();
         });
   }
 
@@ -69,6 +67,11 @@ class MonthTaskPageState extends State<MonthTaskPage>
       halfBoundValue: AnimationControllerValue(percentage: 0.5),
       duration: Duration(milliseconds: 200),
     );
+
+    globalData.onLoadDataFinishedFn = () {
+      _monthView.Refresh();
+      _todoView.Refresh();
+    };
   }
 
   @override
