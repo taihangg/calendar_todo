@@ -19,4 +19,7 @@ TODO:
 
 效果截图：
 
-![](https://github.com/taihangg/task_calendar/blob/master/sample_photos/sample1.png)
+![主界面](https://github.com/taihangg/task_calendar/blob/master/sample_photos/sample1.png)
+
+![编辑自定义节日](https://github.com/taihangg/task_calendar/blob/master/sample_photos/sample2.png)
+
