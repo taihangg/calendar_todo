@@ -25,6 +25,7 @@ TODO:
 
 ![编辑自定义节日](https://github.com/taihangg/task_calendar/blob/master/sample_photos/sample2.png)
 
+---
 
 发现一个项目：fluttercandies/flutter_custom_calendar(https://github.com/fluttercandies/flutter_custom_calendar)，
 比这个试手的粗糙项目成熟多了，推荐给有需要的人！
