@@ -315,7 +315,7 @@ class LunarHelper {
     double result = 0;
     String strSpliter = "°'\"";
 
-    RegExp re = new RegExp("[°'\"]");
+    RegExp re = RegExp("[°'\"]");
 
     List<String> strD = d.split(re);
 
