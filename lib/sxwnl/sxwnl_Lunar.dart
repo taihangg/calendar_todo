@@ -122,12 +122,12 @@ class DayInfo {
     // 农历节日
     if ("闰" != this.lunarRunyue) {
       //闰月不算节日
-      final str1 = "${this.lunarMonthIndex + 1}.${this.lunarDay}";
+      final str1 = "${this.lunarMonth}.${this.lunarDay}";
       this.lunarFestival += lunarfestivals[str1] ?? "";
 
       // 月用倒数序的节日
       final invertFestivalFmt =
-          "${this.lunarMonthIndex + 1}.-${this.Ldn.toInt() - this.lunarDay + 1}";
+          "${this.lunarMonth}.-${this.Ldn.toInt() - this.lunarDay + 1}";
       final invertFestival = lunarfestivals[invertFestivalFmt];
       if (null != invertFestival) {
         this.lunarFestival +=
@@ -192,6 +192,21 @@ class LunarMonth {
 
     this.yueLiCalc(By.toInt(), JD.M, dayCount); // 农历计算
   }
+
+  Map<String, int> _han2Int = {
+    "正": 1,
+    "二": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
+    "十": 10,
+    "冬": 11,
+    "腊": 12,
+  };
 
   // 计算公历某一个月的"公农回"三合历, 并把相关信息保存到月对象 lun, 以及日对象 lun[?] 中
   // <param name="By">要计算月历的年</param>
@@ -271,8 +286,16 @@ class LunarMonth {
       if ((day.d0 == SSQ.HS[mk]) || (day.d0 == Bd0)) {
         // 月的信息
         day.lunarMonthIndex = (mk + 12 - 2) % 12;
-        day.lunarMonth = day.lunarMonthIndex + 1;
         day.lunarMonthName = SSQ.ym[mk] + "月"; // 月名称
+        //        day.lunarMonth = day.lunarMonthIndex + 1; // 不能直接这么算，会出错
+        day.lunarMonth = _han2Int[SSQ.ym[mk]];
+
+//        print(
+//            "xxx ${day.year}-${day.month}-${day.day} ${day.lunarMonthName} ${day.lunarMonth}, ${day.lunarMonthIndex + 1} " +
+//                ((day.lunarMonth == day.lunarMonthIndex + 1)
+//                ? ""
+//                : "xxx"));
+
         day.Ldn = SSQ.dx[mk]; // 月大小
         day.lunarMonthDayCount = day.Ldn.toInt();
         day.lunarRunyue = (SSQ.leap != 0 && SSQ.leap == mk) ? "闰" : ""; // 闰状况
