@@ -591,7 +591,6 @@ final lishijinianbiao = SxwnlData(
 final gregorianFestivals = {
   "1.1": "元旦",
   "3.8": "妇女节",
-  "4.5": "清明",
   "5.1": "劳动节",
   "6.1": "儿童节",
   "7.1": "建党节",
